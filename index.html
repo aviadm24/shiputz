@@ -578,16 +578,25 @@ function renderPhases(){
         var wa=p.workerAssignments[j],w=null;
         for(var k=0;k<workers.length;k++){if(workers[k].id===wa.wid){w=workers[k];break;}}
         var hrs=wa.mode==='hours'?(wa.hours||0):((wa.days||0)*(wa.dailyHours||8));
+        var wPaid=w?parseFloat(w.amount)||0:0;
+        var wDebt=w?parseFloat(w.debt)||0:0;
         html+='<div class="wa-row"><div class="wa-wname">'+(w?w.name:'פועל לא ידוע')+'</div>';
         if(wa.mode==='flat'){
           html+='<div class="wa-detail">תשלום קבוע</div>';
-          html+='<div class="wa-cost">'+fmt(wa.flatAmount||0)+'</div>';
+          html+='<div class="wa-cost">עלות מחושבת: '+fmt(wa.flatAmount||0)+'</div>';
         }else if(wa.mode==='hours'){
           html+='<div class="wa-detail">'+hrs+' שעות × '+(w&&w.rate?fmt(w.rate):'?')+'/שעה</div>';
-          html+='<div class="wa-cost">'+fmt(calcWACost(wa))+'</div>';
+          html+='<div class="wa-cost">עלות מחושבת: '+fmt(calcWACost(wa))+'</div>';
         }else{
           html+='<div class="wa-detail">'+wa.days+' ימים × '+wa.dailyHours+' שעות/יום × '+(w&&w.rate?fmt(w.rate):'?')+'/שעה</div>';
-          html+='<div class="wa-cost">'+fmt(calcWACost(wa))+'</div>';
+          html+='<div class="wa-cost">עלות מחושבת: '+fmt(calcWACost(wa))+'</div>';
+        }
+        if(wPaid>0||wDebt>0){
+          html+='<div style="margin-top:6px;padding-top:6px;border-top:1px solid #2a2010;">';
+          if(wPaid>0) html+='<div style="font-size:11px;color:#4caf50;">✓ שולם לפועל: '+fmt(wPaid)+'</div>';
+          if(wDebt>0) html+='<div style="font-size:11px;color:#e07040;">⏳ ממתין לפועל: '+fmt(wDebt)+'</div>';
+          html+='<div style="font-size:9px;color:#5a4010;margin-top:2px;">* מוצג למידע בלבד — לא נספר פעמיים</div>';
+          html+='</div>';
         }
         html+='</div>';
       }
